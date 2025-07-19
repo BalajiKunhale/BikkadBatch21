@@ -1,0 +1,440 @@
+# 1_._ Difference between malloc() and new / Difference between free() and delete
+
+malloc():-
+malloc() is a function from the C standard library used for dynamic memory allocation.
+It allocates a block of memory of the given size but does not call any constructor.
+
+new :-
+new is a C++ operator that allocates memory and also calls the constructor of the object.
+It returns the correct type of pointer without needing a cast.
+
+free() :-
+free() is used to deallocate memory allocated by malloc(). 
+It doesn't call any destructor.
+
+delete :-
+delete is used to deallocate memory allocated by new. 
+it calls the destructor of the object.
+
+
+
+
+
+
+
+# 3_._ What is this pointer?
+
+* The this pointer is an pointer available to all  non-static member functions of a class.
+
+* It points to the object that invoked the function.
+
+* 'this ' is not available in static member functions because static functions are 
+    not tied to any specific instance.
+
+* Friend functions are also not members of the class, so they do not have a this pointer.
+
+* ' this ' pointer stores the address of the object on which the member function is invoked
+
+
+Function Type	     | Is this Pointer|      	Reason
+                     |  Available?    |
+_____________________|________________|___________________________________________________
+* Static Functions   |	No	      |  Static functions belong to the class, 
+                     |                |    not an object,  so no this pointer is passed.
+                     |                |
+* Virtual Functions  |	Yes	      |  Virtual functions are non-static member functions, 
+                     |                |    so this points to the current object.
+                     |                |
+* Const Functions    |	Yes           |  this is available, but it points to a
+                   (as Const ClassName*)   constant object (no modification allowed).
+                     |                |       
+* Friend Functions   |  No	      |  Friend functions are not member functions,
+                     |                |    so no this pointer exists.
+
+In summary, the this pointer is available for non-static, 
+ non-friend member functions (including virtual and const member functions). 
+It is not available in static or friend functions.
+
+
+
+
+
+
+
+# 4_._ Are static members inherited to the derived class?
+
+Yes, static members (both static variables and static functions) are inherited by the derived class in C++,
+ but they are treated differently from non-static members.
+
+
+Static Members and Inheritance:--
+ Static members are inherited by derived classes, but they remain shared across the class hierarchy 
+  (i.e., they are not duplicated per object or per class instance).
+ You can access static members via the derived class, but there is only one instance of a static member shared between the base and derived classes.
+
+Why Static Functions Cannot Be const:--
+Static functions do not operate on any object, so the concept of const—which is used to ensure that a
+ function does not modify the state of an object—does not apply.
+
+Why Static Functions Cannot Be virtual:
+Static functions do not operate on objects, so they cannot participate in polymorphism. 
+ Virtual functions require an object context to perform dynamic dispatch, which static functions do not have.
+
+
+
+
+
+
+
+
+
+# 5_._What is the need to write user defined destructor? When it should be declared as "virtual"?
+
+  A user-defined destructor in C++ is needed when your class manages resources that need to be explicitly released when an object is destroyed, 
+  such as dynamic memory (allocated with new), file handles, network connections, or other system resources. 
+
+ The destructor is responsible for cleaning up these resources to prevent memory leaks or resource exhaustion.
+
+ Summary:
+ User-defined destructor is needed to free dynamically allocated resources, 
+ close file handles, or release any other managed resources that require cleanup.
+
+Virtual destructor is necessary when you plan to inherit from a class and delete derived objects through a pointer to the base class. 
+This ensures that the destructors of both base and derived classes are called in the correct order, 
+preventing resource leaks and undefined behavior.
+
+
+
+
+
+
+
+
+
+# 6_._Explain dynamic_cast operator. When it is required? Explain with example.
+
+  The dynamic_cast operator in C++ is used for safely downcasting pointers or references to polymorphic types 
+  (i.e., types that involve inheritance and have at least one virtual function). 
+
+  It performs a runtime check to ensure that the cast is valid, and if the cast is not possible,
+   it returns nullptr (for pointers) or throws a bad_cast exception (for references). 
+
+ This makes dynamic_cast useful when working with class hierarchies, especially when dealing with complex inheritance structures.
+
+
+ 1. Purpose of dynamic_cast:---
+
+ # dynamic_cast is primarily used for downcasting (casting from a base class to a derived class) in a type-safe way.
+ # It is only applicable to pointers or references to polymorphic types (i.e., types with at least one virtual function)
+
+
+
+
+
+
+
+
+# 7_._What is the difference between pointer and reference?
+
+1. Syntax and Declaration:
+Pointer: 
+    A pointer is declared using the * symbol. 
+    It explicitly holds the memory address of another variable.
+
+           int x = 10;
+           int* ptr = &x;  // ptr holds the address of x
+
+
+Reference: 
+       A reference is declared using the & symbol. 
+       It is essentially an alias for another variable, and once initialized, 
+       it cannot be changed to refer to another object.
+
+           int x = 10;
+           int& ref = x;  // ref is an alias to x
+
+
+
+   Summary of Differences :-
+______________________________________________________________________________________________________________
+Feature	               |        Pointer	                            |      Reference
+_______________________|____________________________________________|_________________________________________
+Syntax	               |     int* ptr = &x;	                    |   int& ref = x;
+Nullability	       |     Can be nullptr	                    |   Cannot be null
+Initialization	       |     Can be uninitialized	            |   Must be initialized
+Reassignment	       |    Can point to different objects	    |   Cannot be reseated
+Memory Address Access  |   Holds an address explicitly	            |  Implicitly refers to an object
+Dereferencing	       |    Needs explicit dereferencing (*ptr)	    |  Acts like the object it refers to
+Pointer Arithmetic     |   Supports pointer arithmetic	            |   Does not support arithmetic
+Memory Usage	       |    Takes up memory (4 or 8 bytes)	    |  No separate memory for the reference
+Object Relationship    |  Can point to different objects or nullptr |   Always refers to a valid object
+Use in Functions       |  Typically used for pass-by-pointer	    |   Typically used for pass-by-reference
+______________________________________________________________________________________________________________
+
+
+Use Cases Recap:
+# pointers :--
+     when you need to work with dynamic memory, traverse arrays, or handle nullable objects.
+# references :--
+     for safer and more readable code when you need to alias a variable, pass arguments by reference, or 
+     when you know the reference will always point to a valid object.
+
+
+
+
+
+
+
+
+
+# 8_._What is diamond problem? How to solve it?
+ 
+ It arises when a class inherits from two or more classes that share a common base class, 
+  creating an ambiguity in the inheritance hierarchy. 
+ The term "diamond" comes from the shape of the inheritance diagram that forms when a class indirectly 
+  inherits from the same base class multiple times through different paths.
+
+
+    A
+   / \
+  B   C
+   \ /
+    D
+
+1.In this diagram:
+
+Class D inherits from both Class B and Class C.
+Both Class B and Class C inherit from the same base class, Class A.
+Now, when an object of Class D is created, it will inherit two copies of Class A (one through Class B and one through Class C). 
+This causes ambiguity because the compiler doesn’t know whether to use the version of A from B or from C.
+
+
+2. Issues Caused by the Diamond Problem:---
+
+   1) Multiple Copies of Base Class Members
+
+      Class D will have two copies of Class A's members  
+        because both B and C independently inherit A. 
+     This duplication causes ambiguity when trying to access members from A.
+
+   2) Ambiguous Member Function Call
+
+
+3. Solution: 
+
+   Virtual Inheritance:---
+       By declaring the base class as a virtual base class, 
+       In virtual inheritance, when multiple derived classes inherit from the same base class, 
+       only one instance of the base class is shared among all derived classes.
+
+
+
+4.  Conclusion:-----------
+  #    The diamond problem arises from ambiguities in multiple inheritance where 
+       a class inherits from the same base class through different paths.
+
+  #    Virtual inheritance solves the diamond problem by ensuring that 
+       there is only one shared instance of the base class, thus eliminating ambiguity and memory duplication.
+
+  #   Use virtual inheritance whenever you foresee multiple inheritance involving a shared base class 
+      to avoid the diamond problem.
+
+
+
+
+
+
+
+
+
+# 9_._ What is operator overloading?
+
+
+
+
+
+
+
+
+# 10_._    What is friend function and friend class
+
+   1. Friend Function :---
+
+     It provide an alternative way to access private data without making all members public.
+
+     A friend function is a function that is not a member of a class, 
+      but has access to its private and protected members. 
+
+     To make a function a friend of a class, you must declare it inside the class with the friend keyword.
+
+    Friend functions are defined outside the scope of the class but can access the class's 
+     private and protected members.
+ 
+
+ 2. Friend Class :----
+
+       A friend class is a class that is granted access to the private and protected members of another class. 
+
+       This is useful when two or more classes need to work very closely together, 
+         allowing one class to directly manipulate the internals of another class.
+
+
+
+ ##   Differences betn Friend Functions & Friend Classes  ##
+______________________________________________________________________________________________________________
+  Aspect	|    Friend Function	                |       Friend Class
+________________|_______________________________________|_____________________________________________________
+Definition	| A function (non-member) that          |  A class whose members can access private 
+                |  can access private members.	        |   members of another class.
+                |                                       |
+Scope	        | Specific functions are given access.	| All members of the friend class are given access.
+                |                                       |
+Syntax	        |  friend <function>	                | friend class <ClassName>
+                |                                       |
+Use Case	| Useful for operator overloading       |   A class whose members can access private 
+                |  or global function access.	        |   and need access to each other's private members.
+________________________________________________________________________________________________________________
+
+
+
+
+
+
+
+
+
+# 11_._  What is shallow copy and deep copy?
+
+     shallow copy and deep copy refer  for copying objects.
+
+
+1. Shallow Copy
+    A shallow copy creates a new object but does not create copies of the objects 
+     that the original object references
+
+   it copies the references (or pointers) to those objects.
+
+
+Characteristics of Shallow Copy:
+             It copies the values of the member variables of the original object.
+             If a member variable is a pointer, only the pointer's address is copied, not the data it points to.
+
+
+2. Deep Copy
+    A deep copy creates a new object and also allocates new memory for all the dynamically allocated resources 
+     that the original object references. 
+
+   In other words, it copies all values, including the data that the pointers refer to.
+
+
+Characteristics of Deep Copy:
+            It copies both the values of the member variables and the actual data that pointers refer to.
+            Each object (original and copied) has its own copy of the dynamically allocated memory.
+
+
+
+When to Use Shallow vs. Deep Copy:
+   # Shallow Copy: 
+    Use shallow copies when you are dealing with immutable data or when multiple objects are meant to 
+    share the same data and you are sure that they will not modify it.
+
+   # Deep Copy: Use deep copies when you need complete independence between objects, especially when
+     managing resources like dynamically allocated memory, and you want to avoid potential memory issues.
+
+
+
+
+Summary:
+      Shallow Copy: 
+        Copies only the pointer references; changes to one object affect the other. Risk of double deletion exists.
+
+      Deep Copy: 
+        Creates a new instance and copies the actual data; changes to one object do not affect the other. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ # 12_._What is difference between set, vector and map 
+
+  In C++, set, vector & map are 3 different types of containers provided by the Standard Template Library (STL). 
+
+
+
+1. Set
+    Definition:---- A set is a container that stores unique elements in a specific order (usually sorted).
+
+    Unique Elements:------ Duplicate values are not allowed.
+
+    Ordered:------  Elements are automatically sorted based on their values
+
+
+2. Vector
+    Definition:--- A vector is a dynamic array that resize itself automatically when elements are added or removed.
+
+    Ordered:------- Elements maintain the order in which they were added.
+
+    Allows Duplicates:------- Can contain multiple copies of the same value.
+
+    Random Access:-------- Provides direct access to elements using an index 
+ 
+
+
+3. Map
+     Definition:----- A map is a collection of key-value pairs, where each key is unique, 
+                      and it is used to store and retrieve data based on keys.
+
+    Key-Value Pairs:----- Each element in a map is a pair of a key and a value.
+
+    Unique Keys:------ Duplicate keys are not allowed, but multiple values can have the same value.
+ 
+    Ordered by Keys:----- Elements are sorted based on their keys.
+
+
+
+
+
+
+
+_______________________________________________________________________________________________________________     
+Feature	             Set	                        Vector	                      Map
+_______________________________________________________________________________________________________________
+Type	        Collection of unique              Dynamic array                 Collection of key-value pairs
+                  elements	
+	
+Duplicates	      No	                         Yes	                No (unique keys)
+
+Order	        Sorted (based on values)	 Insertion order	        Sorted (based on keys)
+
+Access Method	Iteration only	                 Random access (index-based)	Access by key
+
+
+
+
+
+When to Use Each Container
+Use set:
+       When you need to maintain a collection of unique elements.
+       When you need automatic sorting of elements.
+
+Use vector:
+      When you need a resizable array that allows random access.
+      When you need to maintain the order of elements and allow duplicates.
+ 
+Use map:
+      When you need to associate keys with values and ensure unique keys.
+      When you need efficient retrieval of values based on keys.
+
+
+
+
+
